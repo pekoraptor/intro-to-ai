@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-import math
+from functions import f, fGradient, g, gGradient
 import numpy as np
 
 
@@ -21,20 +21,44 @@ class Solver(ABC):
         ...
 
 
-def f(x: int):
-    return (x ^ 4)/4
-
-
-def g(x: np.array):
-    a = -math.exp(-x[0] ^ 2 - x[1] ^ 2)
-    b = -0.5*math.exp(-(x[0] - 1) ^ 2-(x[1] + 2) ^ 2)
-    return 1.5 + a + b
-
-
 class MySolver(Solver):
-    def __init__(self, varCount, learningRate):
-        self.varCount = varCount
+    def __init__(self, learningRate):
         self.learningRate = learningRate
 
     def get_parameters(self):
-        return (self.varCount, self.learningRate)
+        return (self.learningRate)
+
+    def solve(self, problem, problemGradient, x0, final_step=1e-5):
+        steps = 0
+        previousX = x0
+        previous = problem(previousX)
+
+        x = np.array([0 for _ in range(previousX.size)], dtype=np.float64)
+        resultArray = [previous]
+
+        while True:
+            for i in range(previousX.size):
+                x[i] = previousX[i] - self.learningRate * \
+                    problemGradient(previousX)[i]
+
+            result = problem(x)
+            resultArray.append(result)
+
+            if abs(previous - result) < final_step:
+                break
+
+            previousX = x
+            previous = result
+            steps += 1
+
+        return (x, resultArray, steps)
+
+
+# if __name__ == "__main__":
+#     s = MySolver(5)
+#     # output = s.solve(f, fGradient, np.array([5], dtype=np.float64))
+#     x = np.array([4, 5], dtype=np.float64)
+#     output = s.solve(g, gGradient, x)  # check for g
+
+#     print(output[1])
+#     print(output[0])
