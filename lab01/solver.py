@@ -54,11 +54,11 @@ class MySolver(Solver):
         return (x, resultArray, steps)
 
 
-# if __name__ == "__main__":
-#     s = MySolver(5)
-#     # output = s.solve(f, fGradient, np.array([5], dtype=np.float64))
-#     x = np.array([4, 5], dtype=np.float64)
-#     output = s.solve(g, gGradient, x)  # check for g
+if __name__ == "__main__":
+    s = MySolver(0.01)
+    # output = s.solve(f, fGradient, np.array([5], dtype=np.float64))
+    x = np.array([0, 1], dtype=np.float64)
+    output = s.solve(g, gGradient, x, final_step=1e-17)  # check for g
 
-#     print(output[1])
-#     print(output[0])
+    print(output[1])
+    print(output[0])
