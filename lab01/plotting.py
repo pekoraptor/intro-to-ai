@@ -10,15 +10,7 @@ def initPlot(title='', yLabel='', xLabel=''):
     plt.xlabel(xLabel)
 
 
-def plot(learningRate, problem, problemGradient, x0, steps=10):
+def plot(learningRate, problem, problemGradient, x0, steps=10, FinalStep=1e-5):
     s = MySolver(learningRate)
-    s.solve(problem, problemGradient, x0, stepLimit=steps)
+    s.solve(problem, problemGradient, x0, stepLimit=steps, finalStep=FinalStep)
     plt.plot(s.valueArray, label=str(learningRate))
-
-
-initPlot('Different learning rates', 'function values', 'iterations')
-for rate in [0.01, 0.001, 0.0001]:
-    plot(rate, f, fGradient, np.array([5]))
-
-plt.legend(loc='right')
-plt.show()

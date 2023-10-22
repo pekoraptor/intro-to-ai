@@ -24,41 +24,43 @@ class Solver(ABC):
 class MySolver(Solver):
     def __init__(self, learningRate):
         self.learningRate = learningRate
+        self.previousResult = None
+        self.valueArray = None
 
     def get_parameters(self):
-        return (self.learningRate)
+        params = {
+            "learningRate": self.learningRate,
+            "previousResult": self.previousResult,
+            "valueArray": self.valueArray
+        }
 
-    def solve(self, problem, problemGradient, x0, final_step=1e-5):
+        return params
+
+    def solve(self, problem, problemGradient, x0, finalStep=1e-5, stepLimit=1e5):
         steps = 0
         previousX = x0
         previous = problem(previousX)
 
         x = np.array([0 for _ in range(previousX.size)], dtype=np.float64)
-        resultArray = [previous]
+        self.valueArray = [previous]
 
         while True:
+            steps += 1
+            if steps > stepLimit:
+                break
+
             for i in range(previousX.size):
                 x[i] = previousX[i] - self.learningRate * \
                     problemGradient(previousX)[i]
 
             result = problem(x)
-            resultArray.append(result)
+            self.valueArray.append(result)
 
-            if abs(previous - result) < final_step:
+            if abs(previous - result) < finalStep:
                 break
 
             previousX = x
             previous = result
-            steps += 1
 
-        return (x, resultArray, steps)
-
-
-if __name__ == "__main__":
-    s = MySolver(0.01)
-    # output = s.solve(f, fGradient, np.array([5], dtype=np.float64))
-    x = np.array([0, 1], dtype=np.float64)
-    output = s.solve(g, gGradient, x, final_step=1e-17)  # check for g
-
-    print(output[1])
-    print(output[0])
+        self.previousResult = x
+        return (x, steps)
