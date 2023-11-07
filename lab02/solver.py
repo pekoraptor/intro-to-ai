@@ -58,6 +58,7 @@ class MySolver(Solver):
 
     def selection(self, costs):
         minCost = min(costs)
+
         # rescale each cost so that none are negative
         for i, cost in enumerate(costs):
             costs[i] = cost + abs(minCost)
@@ -92,17 +93,40 @@ class MySolver(Solver):
     def solve(self, problem):
         i = 0
         self.population = initPopulation(self.individualSize, self.popSize)
-        costs, best_individual, max_cost = self.grade(problem)
+        costs, bestIndividual, maxCost = self.grade(problem)
         while i < self.maxIterations:
             self.selection(costs)
+            self.crossover()
+            self.mutation()
+            costs, currentBest, currentMax = self.grade(problem)
+            if currentMax > maxCost:
+                bestIndividual = currentBest
+                maxCost = currentMax
+
             i += 1
 
-    def mutation(self):
-        pass
+        return bestIndividual, maxCost
 
     def crossover(self):
-        pass
+        for i in range(self.popSize // 2):
+            if random.randrange(round(1/self.crossProb)) == 0:
+                crossPoint = random.randrange(self.individualSize - 1)
+                newA = self.population[i][:crossPoint] + \
+                    self.population[i + 1][crossPoint:]
+                newB = self.population[i + 1][:crossPoint] + \
+                    self.population[i][crossPoint:]
+                self.population[i] = newA
+                self.population[i + 1] = newB
+
+    def mutation(self):
+        for i in range(self.popSize):
+            for j in range(self.individualSize):
+                if random.randrange(round(1/self.mutationProb)) == 0:
+                    newBit = '1' if self.population[i][j] == '0' else '0'
+                    newIndividual = self.population[i][:j] + \
+                        newBit + self.population[i][j+1:]
+                    self.population[i] = newIndividual
 
 
-# s = MySolver(200, 5, 0.1, 0.1, 10)
-# s.solve(simulateLanding)
+# s = MySolver(200, 5, 0.1, 0.1, 10000)
+# print(s.solve(simulateLanding))
