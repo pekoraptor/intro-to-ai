@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from costFunction import simulateLanding
 from dataclasses import dataclass, field
 import random
+import numpy as np
 
 
 class Solver(ABC):
@@ -57,14 +58,12 @@ class MySolver(Solver):
         return (costs, best_individual, max_cost)
 
     def selection(self, costs):
-        minCost = min(costs)
+        minCost = -1200
 
         # rescale each cost so that none are negative
         for i, cost in enumerate(costs):
             costs[i] = cost + abs(minCost)
 
-        minCost = min(costs)
-        maxCost = max(costs)
         sumCosts = sum(costs)
 
         probs = []  # list with probabilities for each individual
@@ -98,9 +97,13 @@ class MySolver(Solver):
 
     def solve(self, problem):
         i = 0
+        bestEachGen = []
+        meanEachGen = []
         self.population = initPopulation(self.individualSize, self.popSize)
         costs, bestIndividual, maxCost = self.grade(problem)
         currentBest = bestIndividual
+        bestEachGen.append(maxCost)
+        meanEachGen.append(np.mean(costs))
         while i < self.maxIterations:
             newPopulation = self.selection(costs)
             newPopulation.append(currentBest)
@@ -108,13 +111,15 @@ class MySolver(Solver):
             self.crossover()
             self.mutation()
             costs, currentBest, currentMax = self.grade(problem)
+            bestEachGen.append(currentMax)
+            meanEachGen.append(np.mean(costs))
             if currentMax > maxCost:
                 bestIndividual = currentBest
                 maxCost = currentMax
 
             i += 1
 
-        return bestIndividual, maxCost
+        return bestIndividual, maxCost, bestEachGen, meanEachGen
 
     def crossover(self):
         for i in range(self.popSize // 2):
