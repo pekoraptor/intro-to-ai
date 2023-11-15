@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from costFunction import simulateLanding
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 import random
 
 
@@ -40,8 +40,8 @@ class MySolver(Solver):
     popSize: int
     mutationProb: float
     crossProb: float
-    population = []
     maxIterations: int
+    population: list[int] = field(default_factory=list)
 
     def grade(self, problem):
         costs = []
@@ -79,23 +79,32 @@ class MySolver(Solver):
             ranges.append(rangeSum)
 
         newPopulation = []
-        for _ in range(self.popSize):
+        for _ in range(self.popSize - 1):
             chosen = random.randrange(ranges[-1])
             for index, r in enumerate(ranges):
                 if chosen < r:
                     newPopulation.append(self.population[index])
                     break
-        self.population = newPopulation
+        return newPopulation
 
     def get_parameters(self):
-        pass
+        return {
+            "individualSize": self.individualSize,
+            "popSize": self.popSize,
+            "mutationProb": self.mutationProb,
+            "crossProb": self.crossProb,
+            "maxIterations": self.maxIterations
+        }
 
     def solve(self, problem):
         i = 0
         self.population = initPopulation(self.individualSize, self.popSize)
         costs, bestIndividual, maxCost = self.grade(problem)
+        currentBest = bestIndividual
         while i < self.maxIterations:
-            self.selection(costs)
+            newPopulation = self.selection(costs)
+            newPopulation.append(currentBest)
+            self.population = newPopulation
             self.crossover()
             self.mutation()
             costs, currentBest, currentMax = self.grade(problem)
@@ -126,7 +135,3 @@ class MySolver(Solver):
                     newIndividual = self.population[i][:j] + \
                         newBit + self.population[i][j+1:]
                     self.population[i] = newIndividual
-
-
-# s = MySolver(200, 5, 0.1, 0.1, 10000)
-# print(s.solve(simulateLanding))

@@ -16,7 +16,7 @@ def simulateLanding(individual: str):
         altitude += velocity
 
         if altitude < 2:
-            if abs(velocity) < 2:
+            if abs(velocity) < 2 and altitude >= 0:
                 return 2000 - fuel
             else:
                 return -1000 - fuel
