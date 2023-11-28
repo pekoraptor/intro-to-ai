@@ -33,7 +33,6 @@ def testRandom(games, d):
 def play():
     os.system('cls' if os.name == 'nt' else 'clear')
     g = ConnectFour((7, 6), Player('1'), Player('2'))
-    # player 2 = bot
     while not g.is_finished():
         print(g.state)
         print(connectFourHeuristic(g.state, '2'))
@@ -43,16 +42,13 @@ def play():
             break
         _, botMove = alphabeta(g.state, 5, -math.inf,
                                math.inf, '2', connectFourHeuristic)
-        # _, botMove = minimax(g.state, 3, '2', connectFourHeuristic)
         g.make_move(botMove)
-        # os.system('cls' if os.name == 'nt' else 'clear')
     print(g.get_winner())
 
 
 def soloPlay():
     os.system('cls' if os.name == 'nt' else 'clear')
     g = ConnectFour((7, 6), Player('1'), Player('2'))
-    # player 2 = bot
     while not g.is_finished():
         print(g.state)
         print(connectFourHeuristic(g.state, '2'))
@@ -61,11 +57,7 @@ def soloPlay():
         playerMove = int(input('Input your move:    '))
         if g.is_finished():
             break
-        # _, botMove = alphabeta(g.state, 6, -math.inf, +
-            #    math.inf, '2', connectFourHeuristic)
-        # _, botMove = minimax(g.state, 3, '2', connectFourHeuristic)
         g.make_move(ConnectFourMove(playerMove))
-        # os.system('cls' if os.name == 'nt' else 'clear')
     print(g.get_winner())
 
 

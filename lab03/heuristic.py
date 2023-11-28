@@ -4,9 +4,9 @@ import math
 def addValue(start, final, isMaximizingPlayer):
     length = abs(final - start)
     if length > 1:
-        value = 1000 if length == 2 else 10000
-        if length == 4:
-            value = math.inf
+        value = 1 if length == 2 else 5
+        # if length == 4:
+        #     value = float('inf')
         if isMaximizingPlayer:
             return value
         else:
@@ -18,9 +18,9 @@ def connectFourHeuristic(node, maximizingPlayer):
     winner = node.get_winner()
     if winner is not None:
         if winner.char == maximizingPlayer:
-            return math.inf
+            return float('inf')
         else:
-            return -math.inf
+            return -float('inf')
 
     columns = len(node.fields)
     rows = len(node.fields[0])
