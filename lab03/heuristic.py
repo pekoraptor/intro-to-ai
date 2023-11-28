@@ -2,17 +2,22 @@ import math
 
 
 def addValue(start, final, isMaximizingPlayer):
-    if abs(final - start) > 1:
+    length = abs(final - start)
+    if length > 1:
+        value = 1000 if length == 2 else 10000
+        if length == 4:
+            value = math.inf
         if isMaximizingPlayer:
-            return abs(final - start)*10
+            return value
         else:
-            return - abs(final - start)*10
+            return - value
+    return 0
 
 
 def connectFourHeuristic(node, maximizingPlayer):
     winner = node.get_winner()
-    if winner:
-        if winner == maximizingPlayer:
+    if winner is not None:
+        if winner.char == maximizingPlayer:
             return math.inf
         else:
             return -math.inf
@@ -25,32 +30,36 @@ def connectFourHeuristic(node, maximizingPlayer):
     for column_id in range(columns):
         player = node.fields[column_id][0]
         start = 0
-        final = len(node.fields)
+        final = len(node.fields[0])
         for row_id in range(rows):
-            if player is None:
+            if node.fields[column_id][row_id] is None:
                 final = row_id
                 break
-            if node.fields[column_id][row_id] != player:
+            elif node.fields[column_id][row_id] != player:
                 start = row_id
                 player = node.fields[column_id][row_id]
 
-        value += addValue(start, final, (player == maximizingPlayer))
+        if player is not None and final != rows and rows - start >= 4:
+            value += addValue(start, final, player.char == maximizingPlayer)
 
     # check horizontals
     for row_id in range(rows):
         player = node.fields[0][row_id]
         start = 0
-        final = len(node.fields[0])
+        final = len(node.fields)
         for column_id in range(columns):
-            if player is None:
-                value += addValue(start, row_id, (player == maximizingPlayer))
+            if node.fields[column_id][row_id] is None:
+                if player is not None:
+                    value += addValue(start, column_id,
+                                      player.char == maximizingPlayer)
                 start = column_id
 
             elif node.fields[column_id][row_id] != player:
                 start = column_id
                 player = node.fields[column_id][row_id]
 
-        value += addValue(start, final, (player == maximizingPlayer))
+        if player is not None:
+            value += addValue(start, final, player.char == maximizingPlayer)
 
     # check diagonals
     # from lower left (lower half)
@@ -59,15 +68,18 @@ def connectFourHeuristic(node, maximizingPlayer):
         start = 0
         final = min(columns - column_id, rows)
         for i in range(min(columns - column_id, rows)):
-            if player is None:
-                value += addValue(start, i, (player == maximizingPlayer))
+            if node.fields[column_id + i][i] is None:
+                if player is not None:
+                    value += addValue(start, i, player.char ==
+                                      maximizingPlayer)
                 start = i
 
-            if node.fields[column_id + i][i] != player:
+            elif node.fields[column_id + i][i] != player:
                 start = i
                 player = node.fields[column_id + i][i]
 
-        value += addValue(start, final, (player == maximizingPlayer))
+        if player is not None:
+            value += addValue(start, final, player.char == maximizingPlayer)
 
     # upper half
     for row_id in range(rows)[1:]:
@@ -77,15 +89,18 @@ def connectFourHeuristic(node, maximizingPlayer):
         start = 0
         final = min(rows - row_id, columns)
         for i in range(min(rows - row_id, columns)):
-            if player is None:
-                value += addValue(start, i, (player == maximizingPlayer))
+            if node.fields[i][row_id + i] is None:
+                if player is not None:
+                    value += addValue(start, i, player.char ==
+                                      maximizingPlayer)
                 start = i
 
-            if node.fields[i][row_id + i] != player:
+            elif node.fields[i][row_id + i] != player:
                 start = i
                 player = node.fields[i][row_id + i]
 
-        value += addValue(start, final, (player == maximizingPlayer))
+        if player is not None:
+            value += addValue(start, final, player.char == maximizingPlayer)
 
     # from lower right (lower half)
     for column_id in range(columns)[::-1]:
@@ -93,15 +108,18 @@ def connectFourHeuristic(node, maximizingPlayer):
         start = 0
         final = min(column_id, rows)
         for i in range(min(column_id, rows)):
-            if player is None:
-                value += addValue(start, i, (player == maximizingPlayer))
+            if node.fields[column_id - i][i] is None:
+                if player is not None:
+                    value += addValue(start, i, player.char ==
+                                      maximizingPlayer)
                 start = i
 
-            if node.fields[column_id - i][i] != player:
+            elif node.fields[column_id - i][i] != player:
                 start = i
                 player = node.fields[column_id - i][i]
 
-        value += addValue(start, final, (player == maximizingPlayer))
+        if player is not None:
+            value += addValue(start, final, player.char == maximizingPlayer)
 
     # upper half
     for row_id in range(rows)[1:]:
@@ -111,12 +129,16 @@ def connectFourHeuristic(node, maximizingPlayer):
         start = 0
         final = min(rows - row_id, columns)
         for i in range(min(rows - row_id, columns)):
-            if player is None:
-                value += addValue(start, i, (player == maximizingPlayer))
+            if node.fields[columns - 1 - i][row_id + i] is None:
+                if player is not None:
+                    value += addValue(start, i, player.char ==
+                                      maximizingPlayer)
                 start = i
 
-            if node.fields[columns - i][row_id + i] != player:
+            elif node.fields[columns - 1 - i][row_id + i] != player:
                 start = i
-                player = node.fields[columns - i][row_id + i]
+                player = node.fields[columns - 1 - i][row_id + i]
+        if player is not None:
+            value += addValue(start, final, player.char == maximizingPlayer)
 
-        value += addValue(start, final, (player == maximizingPlayer))
+    return value
