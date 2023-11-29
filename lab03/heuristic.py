@@ -1,12 +1,7 @@
-import math
-
-
 def addValue(start, final, isMaximizingPlayer):
     length = abs(final - start)
     if length > 1:
         value = 1 if length == 2 else 5
-        # if length == 4:
-        #     value = float('inf')
         if isMaximizingPlayer:
             return value
         else:
