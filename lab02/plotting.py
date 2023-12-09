@@ -6,7 +6,7 @@ def plotMutationBest(indSize, popSize, maxIter, mutationsProbs, crossProb, color
     values = []
     for prob in mutationsProbs:
         s = MySolver(indSize, popSize, prob, crossProb, maxIter)
-        values.append(s.solve(simulateLanding)[2])
+        values.append(s.solve(simulateLanding, None, -1200)[2])
 
     # whole plot
     plt.title('Whole plot')
@@ -45,7 +45,7 @@ def plotMutationMean(indSize, popSize, maxIter, mutationsProbs, crossProb, color
     values = []
     for prob in mutationsProbs:
         s = MySolver(indSize, popSize, prob, crossProb, maxIter)
-        values.append(s.solve(simulateLanding)[3])
+        values.append(s.solve(simulateLanding, None, -1200)[3])
 
     plt.title('Mean cost per generation')
     plt.xlabel('Generation')

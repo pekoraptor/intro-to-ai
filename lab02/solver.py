@@ -57,9 +57,7 @@ class MySolver(Solver):
                 best_individual = individual
         return (costs, best_individual, max_cost)
 
-    def selection(self, costs):
-        minCost = -1200
-
+    def selection(self, costs, minCost):
         # rescale each cost so that none are negative
         for i, cost in enumerate(costs):
             costs[i] = cost + abs(minCost)
@@ -95,17 +93,18 @@ class MySolver(Solver):
             "maxIterations": self.maxIterations
         }
 
-    def solve(self, problem):
+    def solve(self, problem, pop0=None, minCost=0):
         i = 0
         bestEachGen = []
         meanEachGen = []
-        self.population = initPopulation(self.individualSize, self.popSize)
+        self.population = initPopulation(
+            self.individualSize, self.popSize) if pop0 == None else pop0
         costs, bestIndividual, maxCost = self.grade(problem)
         currentBest = bestIndividual
         bestEachGen.append(maxCost)
         meanEachGen.append(np.mean(costs))
         while i < self.maxIterations:
-            newPopulation = self.selection(costs)
+            newPopulation = self.selection(costs, minCost)
             newPopulation.append(currentBest)
             self.population = newPopulation
             self.crossover()
