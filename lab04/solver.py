@@ -35,6 +35,9 @@ class MySolver(Solver):
         self.root = None
         self.max_depth = max_depth
 
+    def get_parameters(self):
+        pass
+
     def fit(self, X: list, y: list):
         self.root = self._build_tree(X, y)
     
@@ -45,8 +48,8 @@ class MySolver(Solver):
         if current_depth <= self.max_depth:
             best_split = self._get_best_split(X, y, pair_count, feature_count)
             if best_split["inf_gain"] > 0:
-                left_child = self.fit(best_split["left_X"], best_split["left_Y"], current_depth + 1)
-                right_child = self.fit(best_split["right_X"], best_split["right_Y"], current_depth + 1)
+                left_child = self._build_tree(best_split["left_X"], best_split["left_Y"], current_depth + 1)
+                right_child = self._build_tree(best_split["right_X"], best_split["right_Y"], current_depth + 1)
                 return Node(best_split["feature_index"], best_split["threshold"], left_child, right_child, best_split["inf_gain"])
 
         y_vals = list(set(y))
@@ -90,6 +93,7 @@ class MySolver(Solver):
 
     def _get_best_split(self, X, y, pair_count, feature_count):
         output = {}
+        output["inf_gain"] = -float('inf')
         max_inf_gain = -float('inf')
 
         for feature_index in range(feature_count):
@@ -118,8 +122,28 @@ class MySolver(Solver):
 
         return output
 
+    def _make_prediction(self, sample, node):
+        if node.value is not None:
+            return node.value
+        elif sample[node.feature_index] < node.threshold:
+            return self._make_prediction(sample, node.left)
+        else:
+            return self._make_prediction(sample, node.right)
+
+    def predict(self, X):
+        return [self._make_prediction(sample, self.root) for sample in X]
+
 
 if __name__ == "__main__":
-    X, y = read_from_csv("lab04/cardio_train.csv", 0, 5)
+    X, y = read_from_csv("cardio_train.csv")
     X = format_data(X, [0, 2, 3], [100, 5, 5])  # format age, height, weight
+    s = MySolver(15)
+    s.fit(X[:20000], y[:20000])
+    correct = 0
+    print('p t')
+    for py, ty in zip(s.predict(X[20000:20100]), y[20000:20100]):
+        print(py, ty)
+        correct += 1 if ty == py else 0
+    print("Accuracy: ", correct / 100)
+
     pass

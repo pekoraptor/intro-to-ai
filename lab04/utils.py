@@ -1,7 +1,7 @@
 import csv
 
 
-def read_from_csv(file_path: str, start: int, end: int):
+def read_from_csv(file_path: str, start=0, end=float('inf')):
     x = []
     y = []
     with open(file_path, 'r') as fh:
@@ -9,28 +9,30 @@ def read_from_csv(file_path: str, start: int, end: int):
         # , fieldnames=[id, age, gender, height, weight, ap_hi, ap_lo, cholesterol, gluc, smoke, alco, active, cardio]
         for i, row in enumerate(reader):
             if i < start:
-                pass
-            elif i > end:
+                continue
+            elif i == end:
                 break
             x.append((
-                row.get("age"),
-                row.get("gender"),
-                row.get("height"),
-                row.get("weight"),
-                row.get("ap_hi"),
-                row.get("ap_lo"),
-                row.get("cholesterol"),
-                row.get("gluc"),
-                row.get("smoke"),
-                row.get("alco"),
-                row.get("active")
+                int(row.get("age")),
+                int(row.get("gender")),
+                int(row.get("height")),
+                int(float(row.get("weight"))),
+                int(row.get("ap_hi")),
+                int(row.get("ap_lo")),
+                int(row.get("cholesterol")),
+                int(row.get("gluc")),
+                int(row.get("smoke")),
+                int(row.get("alco")),
+                int(row.get("active"))
             ))
-            y.append(row.get("cardio"))
+            y.append(int(row.get("cardio")))
     return x, y
 
 
 def format_data(X: list, indexes: list, precisions: list):
-    for sample in X:
+    for i, sample in enumerate(X):
+        new_sample = list(sample)
         for index, precision in zip(indexes, precisions):
-            X[index] = round(X[index] / precision) * precision
+            new_sample[index] = round(new_sample[index] / precision) * precision
+        X[i] = tuple(new_sample)
     return X
