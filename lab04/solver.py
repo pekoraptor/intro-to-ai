@@ -137,7 +137,7 @@ class MySolver(Solver):
 if __name__ == "__main__":
     X, y = read_from_csv("cardio_train.csv")
     X = format_data(X, [0, 2, 3], [100, 5, 5])  # format age, height, weight
-    s = MySolver(15)
+    s = MySolver(0)
     s.fit(X[:20000], y[:20000])
     correct = 0
     print('p t')
@@ -145,5 +145,3 @@ if __name__ == "__main__":
         print(py, ty)
         correct += 1 if ty == py else 0
     print("Accuracy: ", correct / 100)
-
-    pass
