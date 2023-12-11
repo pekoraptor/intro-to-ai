@@ -36,11 +36,12 @@ class MySolver(Solver):
         self.max_depth = max_depth
 
     def get_parameters(self):
-        pass
+        return {"max_depth": self.max_depth,
+                "has_tree": self.root is not None}
 
     def fit(self, X: list, y: list):
         self.root = self._build_tree(X, y)
-    
+
     def _build_tree(self, X, y, current_depth=0):
         pair_count = len(y)
         feature_count = len(X[0])
@@ -48,8 +49,10 @@ class MySolver(Solver):
         if current_depth <= self.max_depth:
             best_split = self._get_best_split(X, y, pair_count, feature_count)
             if best_split["inf_gain"] > 0:
-                left_child = self._build_tree(best_split["left_X"], best_split["left_Y"], current_depth + 1)
-                right_child = self._build_tree(best_split["right_X"], best_split["right_Y"], current_depth + 1)
+                left_child = self._build_tree(
+                    best_split["left_X"], best_split["left_Y"], current_depth + 1)
+                right_child = self._build_tree(
+                    best_split["right_X"], best_split["right_Y"], current_depth + 1)
                 return Node(best_split["feature_index"], best_split["threshold"], left_child, right_child, best_split["inf_gain"])
 
         y_vals = list(set(y))
@@ -105,7 +108,8 @@ class MySolver(Solver):
 
             # loop over all feature_vals to find the split with the most information gain
             for threshold in feature_vals:
-                left_X, left_Y, right_X, right_Y = self._split(X, y, feature_index, threshold)
+                left_X, left_Y, right_X, right_Y = self._split(
+                    X, y, feature_index, threshold)
                 if len(left_X) > 0 and len(right_X) > 0:
                     # calculate inf_gain
                     inf_gain = self._calculate_inf_gain(y, left_Y, right_Y)
