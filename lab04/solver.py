@@ -88,6 +88,8 @@ class MySolver(Solver):
 
     def _calculate_entropy(self, y):
         y_vals = list(set(y))
+        if None in y_vals:
+            y_vals.remove(None)
         entropy = 0
         for y_val in y_vals:
             p = y.count(y_val) / len(y)
@@ -103,7 +105,7 @@ class MySolver(Solver):
             # get unique values for this feature
             feature_vals = []
             for i in range(len(X)):
-                if X[i][feature_index] not in feature_vals:
+                if X[i][feature_index] not in feature_vals and X[i][feature_index] is not None:
                     feature_vals.append(X[i][feature_index])
 
             # loop over all feature_vals to find the split with the most information gain
@@ -114,7 +116,6 @@ class MySolver(Solver):
                     # calculate inf_gain
                     inf_gain = self._calculate_inf_gain(y, left_Y, right_Y)
                     if inf_gain > max_inf_gain:
-                        # node = Node(feature_index, threshold, left_X, left_Y, right_X, right_Y, inf_gain)
                         output["feature_index"] = feature_index
                         output["threshold"] = threshold
                         output["left_X"] = left_X
