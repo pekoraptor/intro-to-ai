@@ -55,9 +55,10 @@ class Agent:
             # update exploration_rate
             if self.exploration_decay:
                 self.exploration_rate = (self.min_exploration_rate +
-                                         (self.max_exploration_rate - self.min_exploration_rate)
+                                         (self.max_exploration_rate -
+                                          self.min_exploration_rate)
                                          * np.exp(-self.exploration_decay*i))
-            
+
             if i % eval_freq == 0:
                 cur_eval_rew = []
                 for _ in range(eval_len):
@@ -76,7 +77,7 @@ class Agent:
             reward_sum += reward
             state = next_state
             step += 1
-        
+
         return reward_sum
 
     def play_visual(self, env):
@@ -89,7 +90,6 @@ class Agent:
             next_state, _, done, _, _, = env.step(action)
             state = next_state
         env.render()
-        return states, actions
 
 
 if __name__ == "__main__":
